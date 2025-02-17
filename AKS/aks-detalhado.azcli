@@ -1,0 +1,23 @@
+# Login
+az login
+
+# Parametros
+aks=aks-cli-detalhado
+local=eastus
+rg=rg-aks-cli
+sku=Standard_B2s
+
+# Criar Grupo de Recursos
+az group create -n $rg -l $local
+
+# Criar AKS com 2 nodes, SKU, AAD habilitado e Conta Local desativada
+az aks create -g $rg -n $aks --enable-aad --disable-local-accounts --node-count 2 --node-vm-size $sku
+
+# Mostrar Detalhes do AKS  
+az aks show -g $rg -n $aks -o yaml
+
+# Detalhes Azure RBAC ~ deve mostrar que está falso - no campo: enableAzureRbac
+az aks show -g $rg -n $aks --query {AzureRBAC:aadProfile} -o yaml
+
+# Ativiar o Azure RABAC
+az aks update -g $rg -n $aks --enable-azure-rbac

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-web-app
+  namespace: alpine-ns
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 172.200.128.251  # IP fixo do LoadBalancer
+  selector:
+    app: deploy-web-app
+  ports:
+  - port: 80       # Porta pública para acesso ao serviço
+    targetPort: 3000  # Porta interna no pod onde o app está rodando

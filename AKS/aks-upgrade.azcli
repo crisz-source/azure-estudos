@@ -1,0 +1,42 @@
+# Login no Azure
+az login
+
+# Parametros
+rg=rg-aks-upgrade
+local=eastus2
+aks=aks-up
+sku=Standard_B2s
+k8sversionold='1.22.11'
+k8sverionnew='1.23.12'
+
+# Obter Versoes disponiveis do AKS por Regiao
+az aks get-versions -l $local -o table
+
+# Criar Grupo de Recursos
+az group create -n $rg -l $local
+
+# Criar AKS com Versao Antiga do Kubernetes
+az aks create -g $rg -n $aks --node-count 1 --node-vm-size $sku --kubernetes-version $k8sversionold
+
+# Obter Versao do AKS
+az aks show -g $rg -n $aks --query currentKubernetesVersion -o yaml
+
+# Obter Upgrades disopniveis para atualizacao do kubernetes no aks
+az aks get-upgrades -g $rg -n $aks -o table
+
+# Upgrade no AKS
+az aks upgrade -g $rg -n $aks --kubernetes-version $k8sverionnew
+
+# Criar NodePool
+az aks nodepool list -g $rg --cluster-name $aks -o table
+az aks nodepool add -g $rg --cluster-name $aks --name nodepool2 --kubernetes-version $k8sversionold
+az aks nodepool show -g $rg --cluster-name $aks --name nodepool2 --query orchestratorVersion -o yaml
+
+# Upgrade no NodePool
+az aks nodepool upgrade -g $rg --cluster-name $aks --name nodepool2 --kubernetes-version $k8sverionnew
+
+# Excluir NodePool
+az aks nodepool delete -g $rg --cluster-name $aks -n nodepool2
+
+# Excluir AKS
+az aks delete -g $rg -n $aks -y --no-wait

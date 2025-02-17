@@ -1,0 +1,87 @@
+# Login no Azure
+az login
+
+# Parametros
+rg=rg-deploy
+local=eastus2
+aks=aks-deployment
+sku=Standard_B2s
+
+# Grupo de Recursos
+az group create -n $rg -l $local
+
+# Criar AKS
+az aks create -g $rg -n $aks --node-count 1 --node-vm-size $sku
+
+# Obter Credenciais
+az aks get-credentials -n $aks -g $rg
+
+# Listar Replica Sets
+kubectl get replicasets --all-namespaces
+kubectl get rs -n ns-rs -o wide
+
+# Aplicar Replica Set
+kubectl create ns ns-rs
+kubectl apply -f AKS/Pods/replicaset.yaml
+kubectl get pods -l app=app-web --show-labels -n ns-rs
+kubectl describe pod app-web-7gzwj -n ns-rs | grep Replica
+
+# Kill Pod
+kubectl delete pod app-web-7gzwj -n ns-rs
+kubectl get pods -l app=app-web --show-labels -n ns-rs
+
+# Scale UP
+kubectl scale replicaset app-web --replicas=5 -n ns-rs
+kubectl get pods -l app=app-web --show-labels -n ns-rs
+
+# Scale Down
+kubectl scale replicaset app-web --replicas=2 -n ns-rs
+kubectl get pods -l app=app-web --show-labels -n ns-rs
+
+# Excluir ReplicaSet
+kubectl delete rs app-web -n ns-rs  
+
+# Listar Deployments
+kubectl get deployments
+
+# Aplicar Deployments
+kubectl create ns loadbalancer-ns
+kubectl apply -f AKS/Pods/deployment.yaml
+kubectl get pods --show-labels
+
+# Escalar Deployment UP
+kubectl scale deployment deploy-app --replicas=4 
+
+# Escalar Deployment Down 
+kubectl scale deployment deploy-app --replicas=2 
+
+# Descrever Deployment
+kubectl describe deployment deploy-app 
+
+# Excluir Deployment
+kubectl delete deploy-app -n deploy-ns
+
+# Services
+# Listar Services
+kubectl get services
+kubectl get svc --watch
+
+# Aplicar Deployment
+kubectl apply -f AKS/Pods/deployment.yaml
+kubectl get pods --show-labels
+
+# Aplicar Service
+kubectl apply -f AKS/Pods/service.yaml
+kubectl get services -n loadbalancer-ns
+
+# Requisicao no Endpoint
+curl http://20.22.39.225
+
+
+# Criando um IP público e fixando ele à um serviço loadbalancer
+az network public-ip create --resource-group <mc_...> --name <nome-do-ip> --sku Standard --allocation-method Static
+# Excluir Resource Group
+az group delete -n $rg -y
+
+
+

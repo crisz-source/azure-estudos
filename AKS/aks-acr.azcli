@@ -1,0 +1,27 @@
+## Provisionando AKS integrado ao ACR pelo Azure CLI
+
+# Login
+az login
+
+# Parametros
+rg=rg-aks-acr
+local=eastus
+acr=acrakscli
+aks=aks-acr-cli
+
+# Criar Grupo de Recursos
+az group create -n $rg -l $local
+
+# Criar AKS
+az aks create -n $aks -g $rg 
+
+az aks create -n $aks -g $rg -l $local --node-count 1 --enable-addons monitoring --generate-ssh-keys # assinatura de estudante da azure
+
+# Criar ACR
+az acr create -n $acr -g $rg --sku basic
+
+# Verificar se o ACR esta acessivel no cluster AKS 
+az aks check-acr -n $aks -g $rg --acr $acr.azurecr.io
+
+# Anexar o ACR ao cluster do AKS 
+az aks update -g $rg -n $aks --attach-acr $acr

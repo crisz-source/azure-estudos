@@ -1,0 +1,30 @@
+## comandos docker de login na azure, login no registry azure, push e pull das imagens.
+
+# Login no azure
+az login
+
+# Build da imagem localmente
+docker build -t site-html .
+
+# Login no ACR
+az acr login --name acrcrisimages 
+
+# Tag na imagem local
+docker tag site-html acrcrisimages.azurecr.io/site-html:latest
+
+# Push para o ACR 
+docker push acrcrisimages.azurecr.io/site-html:latest
+
+# Pull do ACR para máquina local
+docker pull acrcrisimages.azurecr.io/site-html:latest
+
+# Rodar Imagem vindo do ACR
+docker run -d -p 8080:80 acrcrisimages.azurecr.io/site-html:latest
+
+# Listar os container
+docker ps
+
+# Parar o docker run
+docker stop 513ab2e191b6
+
+https://$appservicecristhian:ann3Zck2x233tkjxhpmsRBZvLLo5KXJZ4cv0jEovd6MFwj3uMkZb3oY7ocrY@appservicecristhian.scm.azurewebsites.net/api/registry/webhook

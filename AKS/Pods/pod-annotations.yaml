@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-annotations
+  annotations:
+    imagemregistry: "https://hub.docker.com"
+spec:
+  containers:
+  - name: pod-annotations
+    image: nginx
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 80

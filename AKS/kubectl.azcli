@@ -1,0 +1,143 @@
+# Login no Azure 
+az login
+
+# Parametros
+rg=rg-basic
+local=eastus2
+aks=aks-basic
+sku=Standard_B2s
+
+# Instalar Kubectl
+az aks install-cli
+
+# Criar Grupo de Recursos
+az group create -n $rg -l $local
+
+# Criar AKS
+az aks create -g $rg -n $aks --node-count 1 --node-vm-size $sku 
+
+# Obter Credenciais
+az aks get-credentials -g $rg -n $aks
+
+# Obter Versdoes do Kubernetes
+kubectl version -o yaml
+
+# Informacoes do Cluster
+kubectl cluster-info
+
+# Configuracoes do Cluster
+kubectl config view
+
+# API Resources
+kubectl api-resources
+
+# API Version
+kubectl api-versions
+
+
+# GET - Todos os objetos de todos os namespaces
+kubectl get all
+kubectl get all --all-namespaces
+
+# GET - Obter Pods
+kubectl get pods
+kubectl get po
+kubectl get po --all-namespaces
+kubectl get pods --namespace kube-system
+
+# GET - Obter Namespaces
+kubectl get namespaces
+kubectl get ns
+kubectl get pods -n kube-system
+
+# GET - Obter Nodes
+kubectl get nodes
+kubectl get no
+kubectl get nodes -o wide
+
+# Criar POD com imagem NGINX
+kubectl run nginx --image=nginx
+kubectl get pods
+kubectl run busybox --image=busybox --restart=Never
+
+# Excluir Pod
+kubectl delete pod busybox
+
+# Listar Containers no POD
+kubectl get pods -o jsonpath="{.items[*].spec.containers[*].name}"
+
+# DESCRIBE - Descrever Objetos Kubernetes
+kubectl describe pod nginx
+kubectl get no
+kubectl describe node aks-nodepool1-16022034-vmss000000
+
+# LOGS - Obter Logs
+kubectl logs nginx
+kubectl logs nginx --since=30m nginx
+
+# Excluir Pods
+kubectl delete pod nginx
+kubectl get pods
+
+# Criar Pod com Manifesto YAML
+kubectl apply -f pods/pod.yaml
+kubectl get pods
+kubectl describe pod primeiro-pod
+kubectl logs primeiro-pod
+
+# Listar containers no POD
+kubectl get pods -o jsonpath="{.items[*].spec.containers[*].name}"
+kubectl delete pod primeiro-pod
+
+# Criar Pod com 2 containers (nao eh uma pratica recomendavel)
+kubectl apply -f pods/pod-2containers.yaml
+
+kubectl get pods --watch
+kubectl describe pod pod-containers
+kubectl logs pod-containers container-2
+kubectl logs pod-containers container-1
+
+# Executar comandos no Container
+export MSYS_NO_PATHCONV=1
+kubectl exec -it pod-containers -c container-1 /bin/bash
+kubectl exec pod-containers --container container-1 -- sh -c "cat /usr/share/nginx/html/index.html"
+
+# Adicionar Arquivo ao Container
+kubectl exec pod-containers --container container-1 -- sh -c "echo \"<b>Arquivo criado do pod.</b>\" > /usr/share/nginx/html/pagina.html"
+kubectl exec pod-containers --container container-1 -- sh -c "ls /usr/share/nginx/html"
+kubectl exec pod-containers --container container-1 -- sh -c "cat /usr/share/nginx/html/pagina.html"
+kubectl delete pod pod-containers
+
+# Listar Nodes
+kubectl get no -o wide
+kubectl describe node aks-nodepool1-34492936-vmss000000 
+
+# Listar NodePools no AKS
+az aks nodepool list -g $rg --cluster-name $aks -o table
+
+# Detalhes do NodePools System
+az aks nodepool show -g $rg --cluster-name $aks -n nodepool1 -o yaml
+
+# Adicionar NodePool System
+az aks nodepool add -g $rg --cluster-name $aks -n nodepool2 --node-count 3 --node-vm-size $sku --mode System
+az aks nodepool add -g $rg --cluster-name $aks -n nodepool2 --node-count 1 --node-vm-size $sku --mode System #estudante
+
+# Excluir Node Pool
+az aks nodepool delete -g $rg --cluster-name $aks -n nodepool2
+
+# Adicionar NodePool User
+az aks nodepool add -g $rg --cluster-name $aks -n nodepooluser --node-count 3 --node-vm-size $sku --mode User
+az aks nodepool show -g $rg --cluster-name $aks -n nodepooluser --query powerState.code
+
+az aks nodepool add -g $rg --cluster-name $aks -n nodepooluser --node-count 1 --node-vm-size $sku --mode User #estudante
+az aks nodepool show -g $rg --cluster-name $aks -n nodepooluser --query powerState.code #estudante
+
+# Parar e Iniciar NodePool
+az aks nodepool stop --nodepool-name nodepooluser -g $rg --cluster-name $aks
+az aks nodepool start --nodepool-name nodepooluser -g $rg --cluster-name $aks
+
+# Excluir Nodepool User
+az aks nodepool delete -g $rg --cluster-name $aks -n nodepooluser
+
+# Excluir Grupo de Recursos e AKS
+az group delete -g $rg -y 

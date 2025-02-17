@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-web-app
+  namespace: alpine-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: deploy-web-app
+  template:
+    metadata:
+      labels:
+        app: deploy-web-app
+    spec:
+      containers:
+      - name: web-app
+        image: node:14-alpine # Você pode substituir isso pela imagem do seu app web
+        command: ["node", "-e", "require('http').createServer((req, res) => res.end('Hello from Web App!')).listen(3000)"]
+        resources:
+          limits:
+            memory: "28Mi"
+            cpu: "50m"
+        ports:
+        - containerPort: 3000

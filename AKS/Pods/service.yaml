@@ -1,0 +1,25 @@
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: service-app
+#   namespace: loadbalancer-ns
+# spec:
+#   type: LoadBalancer
+#   selector:
+#     app: deploy-app
+#   ports:
+#   - port: 80
+#     targetPort: 80
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-app
+  namespace: loadbalancer-ns
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 172.200.128.251  # IP fixo criado no Azure e adicionado no grupo de recursos mc...
+  selector:
+    app: deploy-app
+  ports:
+  - port: 80
+    targetPort: 80

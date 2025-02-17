@@ -1,0 +1,104 @@
+# Login no Azure
+az login
+
+# Parametros
+rg=rg-namespaces
+local=eastus2
+aks=aks-namespaces
+sku=Standard_B2s
+
+# Grupo de Recursos
+az group create -n $rg -l $local
+
+# Criar AKS
+az aks create -g $rg -n $aks --node-count 1 --node-vm-size $sku
+
+# Obter Credenciais
+az aks get-credentials -g $rg -n $aks
+
+# Listar Namespaces
+kubectl get namespaces
+kubectl get ns
+
+# Descrever Namespace
+kubectl describe ns default
+
+# Criar Namespace de forma imperativa
+kubectl create namespace desenvolvimento
+kubectl create namespace homologacao
+kubectl create namespace producao
+kubectl describe ns desenvolvimento
+
+# Excluir Namespace
+kubectl delete namespace producao
+
+# Criar Namespace com Manifesto YAML
+kubectl apply -f ns-producao.yaml
+kubectl describe ns producao
+
+# Listar Labels do Namespace
+kubectl get namespaces --show-labels
+
+# Criar POD no Namespace Producao
+kubectl run nginx --image=nginx --namespace producao
+kubectl get pods --namespace producao
+
+# Criar POD com Manifesto YAML no Namespace Desenvolvimento
+kubectl apply -f pod-dev.yaml
+kubectl get pods --namespace desenvolvimento
+
+# Excluir Namespace Desenvolvimento
+kubectl delete namespace desenvolvimento
+kubectl get pods --all-namespaces
+kubectl delete namespace producao
+kubectl delete namespace homologacao
+
+# Annotations
+kubectl apply -f pod-annotations.yaml
+kubectl get pods
+kubectl describe pod pod-annotations
+
+# Labels
+kubectl apply -f pod-label-1.yaml
+kubectl apply -f pod-label-2.yaml
+kubectl apply -f pod-label-3.yaml
+
+kubectl get pods
+kubectl get pods --show-labels 
+
+# Pesquisar por Label
+kubectl get pods -l "env=prod" --show-labels
+kubectl get pods -l "app=nginx-web" --show-labels
+kubectl get pods -l "app=nginx-web, env=dev" --show-labels
+kubectl get pods -l "env!=dev" --show-labels
+kubectl get pods -l "env in (prod)" --show-labels
+
+kubectl get pods --field-selector=metadata.name=pod-1
+
+
+# Node Selectors
+kubectl get nodes --show-labels
+kubectl apply -f pod-selector.yaml
+kubectl get pods
+kubectl describe pod pod-selector
+
+kubectl label node aks-nodepool1-15879888-vmss000000 ambiente=producao
+kubectl delete pod pod-selector
+
+# Node Name
+# Listar Nodes no Cluster AKS
+az aks nodepool list -g $rg --cluster-name $aks --output table
+kubectl get nodes
+
+# Adicionar NodePool System
+az aks nodepool add -g $rg --cluster-name $aks -n nodepool2 --mode system --node-count 1 --node-vm-size $sku
+
+kubectl apply -f pod-nodename.yaml
+kubectl get pods
+kubectl describe pod pod-nodename
+kubectl apply -f pod-nodename-1.yaml
+kubectl describe pod pod-nodepool1
+
+
+# Excluir grupo de recursos com AKS
+az group delete -n $rg -y 

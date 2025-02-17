@@ -1,0 +1,38 @@
+## Criação de um cluster e seus nodes através de Azure CLI
+
+# Login
+az login
+
+# Variaveis
+rg=rg-aks-cli
+local=eastus
+aks=aks-cli
+
+# Criar Grupo de Recursos
+az group create -n $rg -l $local
+
+# Provisionando AKS da forma mais simplificada
+az aks create -g $rg -n $aks
+
+az aks create -g $rg -n $aks --generate-ssh-keys --node-count 1 --node-vm-size Standard_B2s # funciona para assinatura de estudante
+
+# Listando AKS Clusters
+az aks list -o yaml
+
+# URL do AKS
+az aks browse -g $rg -n $aks
+
+# Detalhes do AKS
+az aks show -n $aks -g $rg
+
+# Parar o AKS
+az aks stop -n $aks -g $rg
+
+# Iniciar o AKS
+az aks start -n $aks -g $rg
+
+# Excluir o AKS
+az aks delete -n $aks -g $rg
+
+# Excluir Resource Group
+az group delete -n $rg

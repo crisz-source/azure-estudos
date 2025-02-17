@@ -1,0 +1,54 @@
+# Login no Azure
+az login
+
+# Variaveis
+rg=rg-storage-temp
+local=eastus2
+aks=aks-storage
+sku=Standard_B2s
+
+# Criar Grupo de Recursos
+az group create -n $rg -l $local
+
+# Criar AKS Cluster
+az aks create -n $aks -g $rg --node-count 1 --node-vm-size $sku
+
+# Obter Credenciais
+az aks get-credentials -g $rg -n $aks
+
+# Criar Pod com Armazenamento Temporario
+kubectl apply -f AKS/Pods/pod-temp.yaml
+
+# Listar Pods
+kubectl get pods
+
+# Listar Containers no POD
+kubectl get pods -o jsonpath="{.items[*].spec.containers[*].name}"
+
+# Criar Arquivo no Container A
+kubectl exec -it  empty-dir-a -- sh -c "echo \"Criado no Container A\" > /cache/arquivo.txt"
+
+# Acessar Arquivo no Container A
+kubectl exec -it  empty-dir-a -- sh -c "cat /cache/arquivo.txt"
+
+# Acessar Arquivo no Container B
+kubectl exec -it  empty-dir-b -- sh -c "cat /cache/arquivo.txt"
+
+# Excluir POD
+kubectl delete pod empty-dir
+
+# GIT Repositorio
+
+# Criar Pod usando GitRepo
+kubectl apply -f gitRepos.yaml
+
+# Listar Arquivos no Volume GitRepo
+kubectl exec pod-gitrepo --container repo -- sh -c "ls /site/"
+kubectl exec pod-gitrepo --container repo -- sh -c "ls /site/SiteHTML-Treinamento"
+kubectl exec pod-gitrepo --container repo -- sh -c "ls /site/SiteHTML-Treinamento/imgs"
+
+# Delete do Pod
+kubectl delete pod pod-gitrepo
+
+# Excluir AKS
+az aks delete -n $aks -g $rg

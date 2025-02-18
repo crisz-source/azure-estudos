@@ -98,7 +98,7 @@ spec:
   csi:
     driver: file.csi.azure.com
     readOnly: false
-    volumeHandle: <> #endpoint do file share
+    volumeHandle: /subscriptions/e5a01601-abcd-483a-b69d-36d9c3a9382c/resourceGroups/rg-namespaces/providers/Microsoft.Storage/storageAccounts/scfileshare/queueServices/default #endpoint do file share
     volumeAttributes:
       resourceGroup: rg-namespaces
       shareName: akshare
@@ -161,3 +161,5 @@ parameters:
 # data:
 #   azurestorageaccountname: c2NmaWxlc2hhcmU=  
 #   azurestorageaccountkey: VmgwMm9adWto... (chave codificada em base64)
+
+#kubectl create secret generic azure-secret -n php-nginx --from-literal=azurestorageaccountname=scfileshare --from-literal=azurestorageaccountkey=Vh02oZukhmI/CLkRIpfIFtwv3fdSwq9fNbVV1M1ObcZAhu2CxgSBLPUgC7h4KE2boVoWC6LjHW7++ASti17ZMQ==

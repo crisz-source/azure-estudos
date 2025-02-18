@@ -98,7 +98,7 @@ spec:
   csi:
     driver: file.csi.azure.com
     readOnly: false
-    volumeHandle: /subscriptions/e5a01601-abcd-483a-b69d-36d9c3a9382c/resourceGroups/rg-namespaces/providers/Microsoft.Storage/storageAccounts/scfileshare/queueServices/default #endpoint do file share
+    volumeHandle: <> #endpoint do file share
     volumeAttributes:
       resourceGroup: rg-namespaces
       shareName: akshare

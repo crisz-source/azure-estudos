@@ -31,7 +31,7 @@ az aks create -n $aks -g $rg --node-count 1 --node-vm-size $sku
 az aks get-credentials -n $aks -g $rg
 
 # Criar Segredo com Key do Storage Account
-kubectl create secret generic azure-secret -n php-nginx --from-literal=azurestorageaccountname=scfileshare --from-literal=azurestorageaccountkey=$key
+kubectl create secret generic azure-secret -n php-nginx --from-literal=azurestorageaccountname=$storage --from-literal=azurestorageaccountkey=$key
 
 # Listar Secrets
 kubectl get secrets

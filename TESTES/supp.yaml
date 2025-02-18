@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-prod-nginx
+  namespace: php-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-prod-nginx
+      tier: backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: php-prod-nginx
+        tier: backend
+    spec:
+      containers:
+        - name: php-prod-nginx
+          #image: crisdockerz/www-data-acl:v2 # com usuario
+          #image: crisdockerz/www-data-acl:v3 # RUN chown descomentado
+          image: crisdockerz/www-data-acl:v4 # RUN chown comentado, nao funcionou
+          ports:
+            - containerPort: 8000
+              protocol: "TCP"
+          tty: true
+          stdin: true
+          volumeMounts:
+            - mountPath: /filesystem
+              name: filesystem
+          lifecycle: # usar apenas com a imagem crisdockerz/www-data-acl:v4
+            postStart:
+              exec:
+                command:
+                  - "/bin/sh"
+                  - "-c"
+                  - |
+                    chown -R www-data:www-data /var/www/html
+                    chmod -R 777 /var/www/html
+      volumes:
+        - name: filesystem
+          persistentVolumeClaim:
+            claimName: azurefile
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-prod-loadbalancer
+  namespace: php-nginx
+spec:
+  type: LoadBalancer
+  selector:
+    app: php-prod-nginx
+    tier: backend
+  ports:
+    - port: 80
+      targetPort: 8000
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: azurefile
+  namespace: php-nginx
+  labels:
+    target: php-nginx-filesystem
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: aks-azurefile
+  csi:
+    driver: file.csi.azure.com
+    readOnly: false
+    volumeHandle: /subscriptions/e5a01601-abcd-483a-b69d-36d9c3a9382c/resourceGroups/rg-namespaces/providers/Microsoft.Storage/storageAccounts/scfileshare/queueServices/default
+    volumeAttributes:
+      resourceGroup: rg-namespaces
+      shareName: akshare
+    nodeStageSecretRef:
+      name: azure-secret
+      namespace: php-nginx
+  mountOptions:
+    - dir_mode=0777
+    - file_mode=0777
+    - uid=33
+    - gid=33
+    - mfsymlinks
+    - cache=strict
+    - nosharesock
+    - nobrl
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azurefile
+  namespace: php-nginx
+  labels:
+    target: php-nginx-filesystem
+spec:
+  storageClassName: aks-azurefile
+  volumeName: azurefile
+  resources:
+    requests:
+      storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: aks-azurefile
+  namespace: php-nginx
+provisioner: file.csi.azure.com
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+allowVolumeExpansion: true
+mountOptions:
+  - dir_mode=0777
+  - file_mode=0777
+  - uid=33
+  - gid=33
+  - mfsymlinks
+  - cache=strict
+  - nosharesock
+parameters:
+  skuName: Standard_LRS
+---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: azure-secret
+#   namespace: php-nginx
+# type: Opaque
+# data:
+#   azurestorageaccountname: c2NmaWxlc2hhcmU=  # Base64 do nome da conta de armazenamento
+#   azurestorageaccountkey: VmgwMm9adWto... # Chave codificada em base64

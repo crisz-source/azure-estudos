@@ -21,9 +21,11 @@ spec:
         - name: php-prod-nginx
           #image: crisdockerz/wwwdata:v1 # usuario ROOT - sem a pasta filesystem
           #image: crisdockerz/wwwdata:v2 # usuario ww-data - sem a pasta filesystem
-          
-          #image: crisdockerz/wwwdata:v4 # usuario ROOT - com a pasta filesystem
-          image: crisdockerz/wwwdata:v3 # usuario ww-data - com a pasta filesystem
+          #image: crisdockerz/www-data-teste:v1 # com o RUN chown no dockerfile
+          image: crisdockerz/www-data-teste:v2 # sem  o RUN chown no dockerfile (FUNCIONOU!!!!!!!!!!!)
+          #image: crisdockerz/www-data-teste:v3 # acl adicionado
+          #image: crisdockerz/www-data-cansei:v1 # sei lá
+          #image: crisdockerz/www-data-user-cansei:v1 # criando container com usuario data
           ports:
             - containerPort: 8000
               protocol: "TCP"
@@ -98,7 +100,7 @@ spec:
   csi:
     driver: file.csi.azure.com
     readOnly: false
-    volumeHandle: <xxx>
+    volumeHandle: /subscriptions/e5a01601-abcd-483a-b69d-36d9c3a9382c/resourceGroups/rg-namespaces/providers/Microsoft.Storage/storageAccounts/scfileshare/queueServices/default #endpoint do file share
     volumeAttributes:
       resourceGroup: rg-namespaces
       shareName: akshare
@@ -142,8 +144,8 @@ reclaimPolicy: Delete
 volumeBindingMode: Immediate
 allowVolumeExpansion: true
 mountOptions:
-  - dir_mode=0640
-  - file_mode=0640
+  - dir_mode=0777
+  - file_mode=0777
   - uid=0
   - gid=0
   - mfsymlinks
@@ -159,7 +161,7 @@ parameters:
 #   namespace: php-nginx
 # type: Opaque
 # data:
-#   azurestorageaccountname: xxx=  
-#   azurestorageaccountkey: xxx... (chave codificada em base64)
+#   azurestorageaccountname: c2NmaWxlc2hhcmU=  
+#   azurestorageaccountkey: VmgwMm9adWto... (chave codificada em base64)
 
-#kubectl create secret generic azure-secret -n php-nginx --from-literal=azurestorageaccountname=scfileshare --from-literal=azurestorageaccountkey=xx
+#kubectl create secret generic azure-secret -n php-nginx --from-literal=azurestorageaccountname=scfileshare --from-literal=azurestorageaccountkey=Vh02oZukhmI/CLkRIpfIFtwv3fdSwq9fNbVV1M1ObcZAhu2CxgSBLPUgC7h4KE2boVoWC6LjHW7++ASti17ZMQ==

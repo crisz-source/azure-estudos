@@ -161,5 +161,3 @@ parameters:
 # data:
 #   azurestorageaccountname: c2NmaWxlc2hhcmU=  
 #   azurestorageaccountkey: VmgwMm9adWto... (chave codificada em base64)
-
-#kubectl create secret generic azure-secret -n php-nginx --from-literal=azurestorageaccountname=scfileshare --from-literal=azurestorageaccountkey=Vh02oZukhmI/CLkRIpfIFtwv3fdSwq9fNbVV1M1ObcZAhu2CxgSBLPUgC7h4KE2boVoWC6LjHW7++ASti17ZMQ==

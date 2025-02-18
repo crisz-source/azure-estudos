@@ -1,5 +1,0 @@
-# Ignorar arquivos sensíveis
-AKS/storage-fileshare.azcli
-AKS/azfiles-pvc.azcli
-testesupp.yaml
-dockerfile

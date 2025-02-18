@@ -159,5 +159,7 @@ parameters:
 #   namespace: php-nginx
 # type: Opaque
 # data:
-#   azurestorageaccountname: c2NmaWxlc2hhcmU=  
-#   azurestorageaccountkey: VmgwMm9adWto... (chave codificada em base64)
+#   azurestorageaccountname: xxx=  
+#   azurestorageaccountkey: xxx... (chave codificada em base64)
+
+#kubectl create secret generic azure-secret -n php-nginx --from-literal=azurestorageaccountname=scfileshare --from-literal=azurestorageaccountkey=xx

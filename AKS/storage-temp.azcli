@@ -40,7 +40,7 @@ kubectl delete pod empty-dir
 # GIT Repositorio
 
 # Criar Pod usando GitRepo
-kubectl apply -f gitRepos.yaml
+kubectl apply -f AKS/Pods/gitRepos.yaml
 
 # Listar Arquivos no Volume GitRepo
 kubectl exec pod-gitrepo --container repo -- sh -c "ls /site/"

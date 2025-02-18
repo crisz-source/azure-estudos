@@ -1,0 +1,165 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-prod-nginx
+  namespace: php-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-prod-nginx
+      tier: backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: php-prod-nginx
+        tier: backend
+    spec:
+      containers:
+        - name: php-prod-nginx
+          #image: crisdockerz/wwwdata:v1 # usuario ROOT - sem a pasta filesystem
+          #image: crisdockerz/wwwdata:v2 # usuario ww-data - sem a pasta filesystem
+          
+          #image: crisdockerz/wwwdata:v4 # usuario ROOT - com a pasta filesystem
+          image: crisdockerz/wwwdata:v3 # usuario ww-data - com a pasta filesystem
+          ports:
+            - containerPort: 8000
+              protocol: "TCP"
+          tty: true
+          stdin: true
+          volumeMounts:
+            - mountPath: /filesystem
+              name: filesystem
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - "/bin/sh"
+                  - "-c"
+                  - |
+                    chown -R www-data:www-data /var/www/html/ && \
+                    chmod -R 777 /var/www/html/
+      volumes:
+        - name: filesystem
+          persistentVolumeClaim:
+            claimName: azurefile
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-prod-loadbalancer
+  namespace: php-nginx
+spec:
+  type: LoadBalancer
+  selector:
+    app: php-prod-nginx
+    tier: backend
+  ports:
+    - port: 80
+      targetPort: 8000
+---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: php-nginx-filesystem
+#   labels:
+#     target: php-nginx-filesystem
+#     source: php-nginx-filesystem
+# spec:
+#   capacity:
+#     storage: 32Gi
+#   accessModes:
+#     - ReadWriteMany
+#   persistentVolumeReclaimPolicy: Retain
+#   mountOptions:
+#     - nfsvers=3
+#     - tcp
+#   nfs:
+#     server: suppppx.file.core.windows.net
+#     path: /suppppx
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: azurefile
+  namespace: php-nginx
+  labels:
+    target: php-nginx-filesystem
+    source: php-nginx-filesystem
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: aks-azurefile
+  csi:
+    driver: file.csi.azure.com
+    readOnly: false
+    volumeHandle: /subscriptions/e5a01601-abcd-483a-b69d-36d9c3a9382c/resourceGroups/rg-namespaces/providers/Microsoft.Storage/storageAccounts/scfileshare/queueServices/default #endpoint do file share
+    volumeAttributes:
+      resourceGroup: rg-namespaces
+      shareName: akshare
+    nodeStageSecretRef:
+      name: azure-secret
+      namespace: php-nginx
+  mountOptions:
+    - dir_mode=0777
+    - file_mode=0777
+    - uid=0
+    - gid=0
+    - mfsymlinks
+    - cache=strict
+    - nosharesock
+    - nobrl
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azurefile
+  namespace: php-nginx
+  labels:
+    target: php-nginx-filesystem
+    source: php-nginx-filesystem
+spec:
+  storageClassName: aks-azurefile
+  volumeName: azurefile
+  resources:
+    requests:
+      storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: aks-azurefile
+  namespace: php-nginx
+provisioner: file.csi.azure.com
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+allowVolumeExpansion: true
+mountOptions:
+  - dir_mode=0640
+  - file_mode=0640
+  - uid=0
+  - gid=0
+  - mfsymlinks
+  - cache=strict
+  - nosharesock
+parameters:
+  skuName: Standard_LRS
+---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: azure-secret
+#   namespace: php-nginx
+# type: Opaque
+# data:
+#   azurestorageaccountname: c2NmaWxlc2hhcmU=  
+#   azurestorageaccountkey: VmgwMm9adWto... (chave codificada em base64)
+
+#kubectl create secret generic azure-secret -n php-nginx --from-literal=azurestorageaccountname=scfileshare --from-literal=azurestorageaccountkey=Vh02oZukhmI/CLkRIpfIFtwv3fdSwq9fNbVV1M1ObcZAhu2CxgSBLPUgC7h4KE2boVoWC6LjHW7++ASti17ZMQ==

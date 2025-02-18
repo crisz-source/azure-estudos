@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-pvc
+  labels:
+    name: pod-pvc
+spec:
+  containers:
+  - name: pod-pvc
+    image: nginx
+    volumeMounts:
+      - mountPath: /mnt/azure
+        name: azure
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 80
+  volumes:
+    - name: azure
+      persistentVolumeClaim:
+        claimName: azurefile

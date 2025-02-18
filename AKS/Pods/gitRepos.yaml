@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-gitrepo
+  labels:
+    name: pod-gitrepo
+spec:
+  containers:
+  - name: repo
+    image: nginx
+    volumeMounts:
+      - mountPath: /site
+        name: git-volume
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 80
+  volumes:
+    - name: git-volume
+      gitRepo:
+        repository: "https://github.com/higorbarbosa/SiteHTML-Treinamento.git"
+        

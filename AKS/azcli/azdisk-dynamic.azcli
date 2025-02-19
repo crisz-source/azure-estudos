@@ -1,0 +1,39 @@
+# Login no Azure
+az login
+
+# Parametros
+rg=rg-storage-azdisk
+local=eastus2
+aks=aks-storage-azdisk
+sku=Standard_B2s
+
+# Criar Grupo de Recursos
+az group create -n $rg -l $local
+
+# Criar AKS Cluster
+az aks create -n $aks -g $rg --node-count 1 --node-vm-size $sku
+
+# Obter Credenciais do AKS
+az aks get-credentials -g $rg -n $aks
+
+# Listar Storage Class
+kubectl get sc
+
+# Listar PVCs
+kubectl get pvc --watch
+
+# Criar PVC
+kubectl apply -f pvc-disk-dynamic.yaml
+
+# Criar POD consumindo PV WaitForFirstConsumer
+kubectl apply -f pod-disk-dynamic.yaml
+kubectl get pod --watch
+
+# Listar Arquivos no Azure Disk do Container
+kubectl exec pod-disk-dynamic --container container -- sh -c "ls /mnt/azure"
+
+# Criar Arquivo via Container
+kubectl exec pod-disk-dynamic --container container -- sh -c "echo \"Criado no Container\" > /mnt/azure/arquivo.txt"
+
+# Excluir grupo de recursos
+az group delete -n $rg -y --no-wait

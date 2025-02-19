@@ -19,9 +19,9 @@ spec:
     spec:
       containers:
         - name: php-prod-nginx
-          #image: crisdockerz/www-data-acl:v2 # com usuario
-          #image: crisdockerz/www-data-acl:v3 # RUN chown descomentado
-          image: crisdockerz/www-data-acl:v4 # RUN chown comentado, nao funcionou
+          #image: crisdockerz/www-data-acl:v2 # com usuario, deu biziu e não sei pq rs
+          #image: crisdockerz/www-data-acl:v3 # RUN chown descomentado, funcionou
+          image: crisdockerz/www-data-acl:v4 # RUN chown comentado, funcionou
           ports:
             - containerPort: 8000
               protocol: "TCP"

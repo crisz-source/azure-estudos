@@ -1,0 +1,32 @@
+# Login no Azure
+az login
+
+# Obter Credenciais
+az aks get-credentials --resource-group rg-storage-disks --name aks-disks-static
+
+# Listar Persistent Volumes (PV)
+kubectl get pv --watch
+
+# Listar Storage Classes
+kubectl get sc
+
+# Criar PV
+kubectl apply -f AKS/Pods/pv-disk-static.yaml
+
+# Listar Persistent Volume Claims
+kubectl get pvc --watch
+
+# Criar PVC
+kubectl apply -f AKS/Pods/pvc-disk-static.yaml
+
+# Listar PODs
+kubectl get pods --watch
+
+# Criar POD
+kubectl apply -f AKS/Pods/pod-disk-static.yaml
+
+# Listar Arquivos no Disk pelo Container
+kubectl exec pod-disk-static --container container -- sh -c "ls /mnt/azure"
+
+# Criar Arquivo no Disk a partir do Container
+kubectl exec pod-disk-static --container container -- sh -c "echo \"Criado no Container 2\" > /mnt/azure/arq-container-2.txt"

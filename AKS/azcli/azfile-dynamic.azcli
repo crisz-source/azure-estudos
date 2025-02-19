@@ -1,0 +1,37 @@
+# Login no Azure
+az login
+
+# Variaveis
+rg=rg-storage-fileshare
+local=eastus2
+aks=aks-storage-file
+sku=Standard_B2s
+
+# Criar Grupo de Recursos
+az group create -n $rg -l $local
+
+# Criar AKS
+az aks create -n $aks -g $rg --node-count 1 --node-vm-size $sku
+
+# Obter Credenciais
+az aks get-credentials -g $rg -n $aks
+
+# Listar todos os Storage Classes
+kubectl get sc --watch
+
+# Criar novo Storage Class
+kubectl apply -f AKS/Pods/sc-files-dynamic.yaml
+
+# Criar PVC
+kubectl get pvc --watch
+kubectl apply -f pvc-files-dynamic.yaml
+
+# Criar Pod
+kubect get pods
+kubectl apply -f AKS/Pods/pod-files-dynamic.yaml
+
+# Listar arquivos no File Share
+kubectl exec -it pod-files-dynamic -- sh -c "ls /mnt/azure"
+
+# Criar Arquivo a partir do container
+kubectl exec -it pod-files-dynamic -- sh -c "echo \"Criado no Container\" > /mnt/azure/arq-container.txt"

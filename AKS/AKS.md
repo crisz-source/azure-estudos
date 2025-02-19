@@ -84,10 +84,11 @@ spec:
 
 
 # Conta de Armazenamento
-1) - 
-2) - 
-3) - 
-4) - 
-5) - 
-6) - 
-7) - 
+1) - Na barra de pesquisa do portal Azure, pesquise por "Contas de armazenamento"
+2) - Clique em criar
+3) - Preencha as inforamções necessárias
+4) - No campo "Serviço primário", escolha a melhor opção de acordo com o ambiente. Compartilhamento de arquivos, File Share Azure é a melhor opção, NFS e afins, Azure blob e Azure Data Lake Storage Gen 2 é a melhor opção
+5) - Em "Avançado" Caso queira NFS V3, marque a opção "Habilitar namespace hierárquico" e depois "Habilitar o sistema de arquivos de rede v3"
+6) - Em "Rede" Habilite o acesso público ou desabilite dependendo do cenário. A conta de armazenamento deve usar a mesma VNET do AKS, comumente chamada "aks-vnet-XXXX" e "aks-subnet (XXXXX)". Se tiver marcado a opção de acesso ao ip público, deverá acrescentar um IP
+7) - Examniar + Criar
+8) - Depois criado, abra a conta de armazenamento e crie um File share ou container dependendo do cenário de sua aplicação. Se for um cenário que utiliza NFS, container seria uma boa opção pois nele existe uma configuração de ACL(Access Control List). Caso a sua aplicação não necessite de NFS, poderá criar um file share normalmente.

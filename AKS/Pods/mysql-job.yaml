@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-cliente-job
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: mysql-cliente
+        image: mysql:5.7
+        command: ["sh", "-c", "mysql -h $HOSTNAME -u${USER} -p${PASSWORD} -e 'SHOW databases;'"]
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            configMapKeyRef:
+              key: host
+              name: mysql-config
+        - name: USER
+          valueFrom:
+            configMapKeyRef:
+              key: usuario
+              name: mysql-config
+        - name: PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: senha
+              name: mysql-config

@@ -23,10 +23,10 @@ kubectl get sc
 kubectl get pvc --watch
 
 # Criar PVC
-kubectl apply -f pvc-disk-dynamic.yaml
+kubectl apply -f AKS/Pods/pvc-disk-dynamic.yaml
 
 # Criar POD consumindo PV WaitForFirstConsumer
-kubectl apply -f pod-disk-dynamic.yaml
+kubectl apply -f AKS/Pods/pod-disk-dynamic.yaml
 kubectl get pod --watch
 
 # Listar Arquivos no Azure Disk do Container

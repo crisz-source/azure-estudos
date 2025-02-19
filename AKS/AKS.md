@@ -82,3 +82,12 @@ spec:
 8) - Defina o máximo de pod por container na estrutura de um arquivo.yaml
 9) - Clique em adicionar se não tiver nenhum rótulo a ser acrescentado. 
 
+
+# Conta de Armazenamento
+1) - 
+2) - 
+3) - 
+4) - 
+5) - 
+6) - 
+7) - 

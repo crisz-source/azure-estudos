@@ -96,7 +96,7 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: aks-azurefile
+  storageClassName: ""
   csi:
     driver: file.csi.azure.com
     readOnly: false
@@ -126,7 +126,7 @@ metadata:
     target: php-nginx-filesystem
     source: php-nginx-filesystem
 spec:
-  storageClassName: aks-azurefile
+  storageClassName: ""
   volumeName: azurefile
   resources:
     requests:
@@ -134,25 +134,25 @@ spec:
   accessModes:
     - ReadWriteMany
 ---
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: aks-azurefile
-  namespace: php-nginx
-provisioner: file.csi.azure.com
-reclaimPolicy: Delete
-volumeBindingMode: Immediate
-allowVolumeExpansion: true
-mountOptions:
-  - dir_mode=0777
-  - file_mode=0777
-  - uid=0
-  - gid=0
-  - mfsymlinks
-  - cache=strict
-  - nosharesock
-parameters:
-  skuName: Standard_LRS
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: aks-azurefile
+#   namespace: php-nginx
+# provisioner: file.csi.azure.com
+# reclaimPolicy: Delete
+# volumeBindingMode: Immediate
+# allowVolumeExpansion: true
+# mountOptions:
+#   - dir_mode=0777
+#   - file_mode=0777
+#   - uid=0
+#   - gid=0
+#   - mfsymlinks
+#   - cache=strict
+#   - nosharesock
+# parameters:
+#   skuName: Standard_LRS
 ---
 # apiVersion: v1
 # kind: Secret

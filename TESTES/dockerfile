@@ -69,7 +69,7 @@
 
     RUN mkdir -p /var/www/html/teste123
 
-    
+    COPY ola-teste.sh /var/www/html/teste123
     
     # Expor porta para acesso
     EXPOSE 8000

@@ -22,7 +22,8 @@ spec:
           #image: crisdockerz/www-data-acl:v2 # com usuario, deu biziu e não sei pq rs
           #image: crisdockerz/www-data-acl:v3 # RUN chown descomentado, funcionou
           #image: crisdockerz/www-data-acl:v4 # RUN chown comentado, funcionou/ sem o cp
-          image: crisdockerz/www-data-acl:v5 # RUN chown comentado, funcionou/ com cp
+          #image: crisdockerz/www-data-acl:v5 # RUN chown comentado, funcionou/ com cp
+          image: crisdockerz/www-data-acl:v6 # sh no command
           ports:
             - containerPort: 8000
               protocol: "TCP"
@@ -37,11 +38,7 @@ spec:
                 command:
                   - "/bin/sh"
                   - "-c"
-                  - |
-                    chown -R www-data:www-data /var/www/html
-                    chmod -R 777 /var/www/html
-                    cp /var/www/html/ola-teste.sh /var/www/html/teste123
-                    /var/www/html/teste123/ola-teste.sh
+                  - "/var/www/html/teste123/ola-teste.sh"
 
       volumes:
         - name: filesystem

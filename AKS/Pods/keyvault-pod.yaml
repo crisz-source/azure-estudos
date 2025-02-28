@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: keyvault-secret-pod
+  labels:
+    name: keyvault-secret-pod
+spec:
+  containers:
+  - name: keyvault-secret-pod
+    image: busybox
+    command: ['sh', '-c', 'white true; do echo "Senha: $(cat /var/keyvault/mysql-senha)"; sleep 10; done']
+    volumeMounts:
+      - name: keyvault-volume
+        mountPath: "/var/keyvault"
+  volumes:
+    - name: keyvault-volume
+      csi:
+        driver: secrets-store.csi.k8s.io 
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: "keyvault-provider-class"

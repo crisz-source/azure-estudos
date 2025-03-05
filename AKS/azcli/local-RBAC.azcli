@@ -1,0 +1,44 @@
+# Login no Azure
+az login
+
+# Parametros
+rg=aks-rbac_group
+local=Brazil_South
+aks=aks-rbac
+
+
+# Grupo de Recursos
+az group create -n $rg -l $local
+
+# AKS credentials
+az aks get-credentials --resource-group $rg --name $aks
+
+# AKS com Conta Local e Kubernetes RBAC Desativado
+az aks create -g $rg -n $aks --node-count 1 --node-vm-size $sku --disable-rbac
+
+# Mostrar Detalhes do nosso AKS
+az aks show -g $rg -n $aks -o yaml
+
+# Listar AKS e seu Status do uso do K8s RBAC
+az aks list --query '[].{Nome:name, RBAC:enableRbac'} -o table
+
+# Criar namespace
+kubectl create ns homologação
+
+# Listar namespaces
+kubectl get ns
+
+# Criar o Service Account 
+kubectl apply -f AKS/Pods/service-account/sysadmin.yaml
+
+# Criar Role para Homologação
+kubectl apply -f AKS/Pods/Role/role-homologacao.yaml
+
+# Mostrar regras
+kubectl get roles -n homologacao
+
+# Verificar se o usuario SysAdmin tem acesso a pods no namespaces homologacao
+kubectl auth can-i list pods --as=system:serviceaccount:homologacao:sysadmin -n homologacao
+
+# Vincular Regra Role-homologacao ao usuario SysAdmin 
+kubectl apply -f AKS/Pods/RoleBinding/role-binding-homologacao.yaml

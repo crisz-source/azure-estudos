@@ -92,3 +92,8 @@ spec:
 6) - Em "Rede" Habilite o acesso público ou desabilite dependendo do cenário. A conta de armazenamento deve usar a mesma VNET do AKS, comumente chamada "aks-vnet-XXXX" e "aks-subnet (XXXXX)". Se tiver marcado a opção de acesso ao ip público, deverá acrescentar um IP
 7) - Examniar + Criar
 8) - Depois criado, abra a conta de armazenamento e crie um File share ou container dependendo do cenário de sua aplicação. Se for um cenário que utiliza NFS, container seria uma boa opção pois nele existe uma configuração de ACL(Access Control List). Caso a sua aplicação não necessite de NFS, poderá criar um file share normalmente.
+
+
+# RBAC
+1) - Crie o Cluster AKS e ative as configurações de RBAC, por padrão atualmente em 03/03/2025 já fica habilitado. 
+2) - Dê uma olhada nos sub-diretórios no diretório pai Pods

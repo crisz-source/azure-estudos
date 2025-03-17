@@ -33,7 +33,7 @@ kubectl get svc -A
 
 
 # Ip do LoadBalancer
-ip=74.163.211.197
+ip=74.163.192.223
 
 # Usar Helm para fazer deploy do  NGINX ingress controller
 helm install ingress-nginx ingress-nginx/ingress-nginx \

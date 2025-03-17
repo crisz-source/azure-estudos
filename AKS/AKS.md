@@ -125,13 +125,19 @@ spec:
 4) - Dê um apply no arquivo *Deployment-app.yaml* no diretório *ingress-nginx* e verifique o que foi configurado.
 
 ## Ingress Controler com NGINX e suas regras
-1) -
-2) -
-3) -
-4) -
-5) -
-6) -
+1) - **nginx.ingress.kubernetes.io/from-to-www-redirect: "true"** = Alias, serve para encaminhar o www para o nome do dominio, por exemplo, se o usuário digitar na URL do navegador www.meusite.com.br, a regra www redirects irá encaminhar www apenas para meu.site.com.br.
+2) - **nginx.ingress.kubernetes.io/ssl-redirect: "true"** = Habilita o redirecionamento de http para https, de 80 para 443
+3) - **nginx.ingress.kubernetes.io/force-ssl-redirect: "true"** = Habilita o forçamento para o protocolo seguro (https)
+4) - **nginx.ingress.kubernetes.io/rewrite-target: "/"** = Habilitando a opção de redirecionamento padrão
+5) - **nginx.ingress.kubernetes.io/preserve-trailing-slash: true** = Habilitando a "/" final da URL, exemplo: meusite.com.br/
 
 # Ingress Controller com AGIC - Azure Gateway Ingress Controller
-1) - 
+1) - Habilite o Aplication gateway no cluster AKS
+2) - Entre no cluster AKS
+3) - Vá em redes, na terceira aba escrito "Integração da rede virtual" 
+4) - Clique em gerenciar, marque a opção de Controlador de entrada, clique em salvar.
+6) - Aguarde exatamente 15-20min para inicializar corretamente o appgtw
+7) - Dê um apply no arquivo root.yaml que está no diretório ingress-applicationGatewayAzure (lembre-se de descomentar as linhas que se referem ao appgw do ingress e comentar o do nginx)
 
+
+# Ingress Controller com TRAEFIK

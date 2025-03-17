@@ -94,6 +94,44 @@ spec:
 8) - Depois criado, abra a conta de armazenamento e crie um File share ou container dependendo do cenário de sua aplicação. Se for um cenário que utiliza NFS, container seria uma boa opção pois nele existe uma configuração de ACL(Access Control List). Caso a sua aplicação não necessite de NFS, poderá criar um file share normalmente.
 
 
-# RBAC
-1) - Crie o Cluster AKS e ative as configurações de RBAC, por padrão atualmente em 03/03/2025 já fica habilitado. 
-2) - Dê uma olhada nos sub-diretórios no diretório pai Pods
+# Azure Active Directory (AAD)
+1) - Pesquise por Active Directory
+2) - Para criar usuários, vá em Users
+3) - Preencha as informações, nome e sobrenome, senha etc...
+4) - Para criar os Grupos, vá em Groups
+5) - Preencha as informaçõs necessárias para criar um grupo
+6) - é possível acrescentar os usuários criados a um grupo especifico
+6.1) - Entre no grupo criado, clique em "Members" no menu lateral esquerdo e clique em "Add members" procure pelo membro que deseja adicionar ao grupo
+7) - É necessário adicionar à assinatura os grupos criados
+7.1) - Vá na sua assinatura e clique em "IAM"
+7.2) - Clique em "Add" 
+7.3) - Escolha a permissão que deseja concender ao grupo criado 
+7.4) - No campo "Members" da página "Add rola assignment" clique em "Select members" e seleciona o grupo que deseja adicionar ao IAM 
+7.5) - Revisar e criar
+8) - Pode-se criar um AKS integrado ao AAD criado
+8.1) - Crie um AKS normalmente, na parte de "access" (por padrão o AAD e o RBAC já vem na criação do AKS até o ano de 2025), marque a opção de habilitar o AAD no AKS, clique no campo para adicionar um grupo ao AAD e selecione o grupo  que deseja.
+9) - Para testar as permissões, basta acessar a conta criada anteriormente nos passos 1 ao 3.
+
+# Ingress Controller com Http Routing (DESENVOLVIMENTO e TESTES)
+1) - O ingress está no diretório chamado "ingress-appRouting "
+2) - Habilite o http routing:  az aks enable-addons -g myGroupResources -n myAksName --addons http_application_routing (recomendado apenas para ambientes de Dev e Homologação)
+3) - Adicione o host no ingress, o comando a seguir é possível pegar o host: *az aks show -n myAksName -g myGroupResources --query addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName*
+4) - Dê um apply no arquivo app.yaml que está no diretório ingress-appRouting 
+
+# Ingress Controller com NGINX
+1) - Siga os pasasos de instalação do ingress NGINX no arquivo *nginx-cli.azcli* no diretório ingress
+2) - Quando instalado pelo helm o ingress controller nginx, ele basicamente cria um ip do publico de um serviço do loadbalancer
+3) - Pegue o IP publico do loadbalancer no grupo de recursos do kubernetes, geralmente nomeado como "MC_myGroupResource_xxx" e adicione na variavel "ip" no arquivo nginx-cli.azcli, ou execute o seguinte comando: kubectl get svc -A
+4) - Dê um apply no arquivo *Deployment-app.yaml* no diretório *ingress-nginx* e verifique o que foi configurado.
+
+## Ingress Controler com NGINX e suas regras
+1) -
+2) -
+3) -
+4) -
+5) -
+6) -
+
+# Ingress Controller com AGIC - Azure Gateway Ingress Controller
+1) - 
+

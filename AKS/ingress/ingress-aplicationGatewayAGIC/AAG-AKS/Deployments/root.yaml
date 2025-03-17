@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-root
+spec:
+  selector:
+    matchLabels:
+      app: service-root
+  template:
+    metadata:
+      labels:
+        app: service-root
+    spec:
+      containers:
+      - name: service-root
+        image: "httpd"
+        ports:
+        - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service1
+spec:
+  selector:
+    matchLabels:
+      app: service1
+  template:
+    metadata:
+      labels:
+        app: service1
+    spec:
+      containers:
+      - name: service1
+        image: iamnoah4real/saywhat
+        env:
+          - name: RESPONSE_MESSAGE
+            value: "Service 1 esta no ar!"
+        ports:
+        - containerPort: 3000
+
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: service1
+# spec:
+#   selector:
+#     matchLabels:
+#       app: service1
+#   template:
+#     metadata:
+#       labels:
+#         app: service1
+#     spec:
+#       containers:
+#       - name: service1
+#         image: httpd:latest  # Usando a imagem oficial do Apache HTTP Server
+#         env:
+#           - name: RESPONSE_MESSAGE
+#             value: "Service 1 está no ar!"
+#         ports:
+#         - containerPort: 3000
+#         volumeMounts:
+#         - name: web-content
+#           mountPath: /usr/local/apache2/htdocs  # Apache serve conteúdo de /usr/local/apache2/htdocs
+#         - name: apache-config
+#           mountPath: /usr/local/apache2/conf/httpd.conf  # Substituindo a configuração do Apache
+#           subPath: httpd.conf
+#         command:
+#           - /bin/sh
+#           - -c
+#           - |
+#             echo "<html><body><h1>${RESPONSE_MESSAGE}</h1></body></html>" > /usr/local/apache2/htdocs/service1.html
+#             httpd-foreground
+#       volumes:
+#       - name: web-content
+#         emptyDir: {}
+#       - name: apache-config
+#         configMap:
+#           name: apache-config-map  # Usando um ConfigMap para fornecer a configuração do Apache
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service2
+spec:
+  selector:
+    matchLabels:
+      app: service2
+  template:
+    metadata:
+      labels:
+        app: service2
+    spec:
+      containers:
+      - name: service2
+        image: iamnoah4real/saywhat
+        env:
+          - name: RESPONSE_MESSAGE
+            value: "Service 2 esta no ar!"
+        ports:
+        - containerPort: 3000

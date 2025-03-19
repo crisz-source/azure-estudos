@@ -1,0 +1,50 @@
+# Permissão ao monitoramento
+app=monitor-aks-app
+workspace=aks-monitor-workspace
+
+# App Registry (Service Principal)
+
+# Listar
+az ad app list -o yaml
+
+# Criar App Registration
+az ad sp create-for-rbac -n $app
+
+# (Vai ser gerado o DirectoryTenant, AplicationClient e ClientSecret = Anote essas informações em algum lugar pois será usado posteriormente no grafana)
+DirectoryTenant=xxxxxxxxxxxxxxxxxxxxxxx
+AplicationClient=xxxxxxxxxxxxxxxxxxxx
+ClientSecret=xxxxxxxxxxxxxxxxxxxxx
+
+# Obter Subscription Id
+subscriptionId=$(az account show --query id -o tsv)
+rgId=$(az group show -n seu_Grupo_De_Recursos --query id -o tsv)
+
+# Criar Role no Grupo de Recursos
+az role assignment create --assignee $appId --role "Monitoring Reader" --scope $rgId # Verificar no portal no IAM do grupo de recursos do AKS e em regras, note que foi criado o monitor-aks-app
+
+
+# Prometheus e Grafana
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+# Update do Repos
+helm repo update
+
+# Criar uma namespace para os recursos
+kubectl create ns prometheus
+
+# Instalar Prometheus com HELM
+helm install prometheus prometheus-community/kube-prometheus-stack -n prometheus
+
+# Verificar os pods que estão rodando no namespace 
+kubectl --namespace prometheus get pods 
+
+# Prometheus - Direcionar Porta para 9090
+kubectl port-forward -n prometheus prometheus-prometheus-kube-prometheus-prometheus-0 9090 # Entre no seu navegador, localhost:9090, com o prometheus rodando, pesquise por "API" se aparecer um monte de api, deu certo com a api server kubernetes
+
+# Obter Usuario e senha do Grafana
+kubectl get secret -n prometheus prometheus-grafana -o=jsonpath='{.data.admin-user}' | base64 -d
+kubectl get secret -n prometheus prometheus-grafana -o=jsonpath='{.data.admin-password}' | base64 -d
+
+
+# # Grafana - Direcionar Porta para 3000
+kubectl port-forward -n prometheus prometheus-grafana-745dc66b47-zfszj 3000 # Entre no seu navegador, localhost:3000, com o prometheus rodando, pesquise por "API" se aparecer um monte de api, deu certo com a api server kubernetes

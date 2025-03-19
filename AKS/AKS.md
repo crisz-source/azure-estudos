@@ -139,5 +139,24 @@ spec:
 6) - Aguarde exatamente 15-20min para inicializar corretamente o appgtw
 7) - Dê um apply no arquivo root.yaml que está no diretório ingress-applicationGatewayAzure (lembre-se de descomentar as linhas que se referem ao appgw do ingress e comentar o do nginx)
 
+# Monitoramento no Cluster AKS com Azure Monitor
+1) - Entre no cluster AKS, e clique em "Monitorar"
+2) - Clique em configuração do monitor no menu de opções na parte de cima
+3) - Clique em configurações mais avançadas e configure de acordo com a sua necessidade, habilando grafana, prometheus, logs e etc
+4) - Aguarde a criação do monitoramento.
+5) - Pode-se verificar no grupo de recursos que foi criado as configurações de monitoramento.
 
-# Ingress Controller com TRAEFIK
+
+# Monitoramento no Custer AKS com Grafana e Prometheus
+1) - Siga os passos do arquivo prometheus-grafana.azcli para a instalação do prometheus e grafana
+2) - Depois de seguir os passos de instalação e expor o grafana na porta 3000, já ter logado na conta, entre em "Conections" no menu esquerdo
+3) - Pesquise por Azure, clique em Azure Monitor e depois em "Add new data source" 
+4) - Preenche as informações de authenticação, os campos de ID tenant, client, client secret foram feitos no arquivo prometheus-grafana.azcli
+5) - Selecione o seu tipo de assinatura e clique em "Salve & Test"
+6) - Após clicar em "Salve & Test", vá no menu lateral esquerdo e clique em Dashboards > New > Import (no canto superior direito)
+7) - Para importar, entre neste link que será a dashboard para azure containers: https://grafana.com/grafana/dashboards/10956-azure-monitor-for-containers-metrics/
+8) - Neste link, vai precisar apenas do ID que é este: 10956
+9) - Volte ao grafana, cole o ID no campo "Grafana.com dashboard URL or ID" e clique em load
+10) - Caso apareça um campo chamado "Azure Monitor-Contoso" selecione o Azure monitor criado anteriormente, e Clique em  import, caso ao contrário clique apenas em import
+
+

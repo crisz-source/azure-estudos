@@ -93,7 +93,7 @@ controller:
                 service:
                   name: jenkins
                   port:
-                    number: 8080  # A porta do serviço do Jenkins
+                    number: 8080  
   
   resources:
     requests:
@@ -287,11 +287,10 @@ controller:
     annotations:
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: "20m"
-      # cert-manager.io/cluster-issuer: "letsencrypt-prod" <- REMOVIDO
     tls:
       - hosts:
           - jenkins.seudominio.com.br
-        secretName: jenkins-tls  # <- Esse Secret deve ser criado manualmente
+        secretName: jenkins-tls 
     rules:
       - host: jenkins.seudominio.com.br
         http:

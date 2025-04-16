@@ -19,13 +19,13 @@ controller:
   ingress:
     enabled: true
     apiVersion: networking.k8s.io/v1
-    #hostName: dominio.com.br  
+    #hostName: jenkins.dominio.com.br  
     hostName: jenkins.74.163.168.68.nip.io  
     annotations:
       nginx.ingress.kubernetes.io/ssl-redirect: "false"
     ingressClassName: nginx
     rules:
-      #- host: dominio.com.br
+      #- host: jenkins.dominio.com.br
       - host: jenkins.74.163.168.68.nip.io  
         http:
           paths:
@@ -35,7 +35,7 @@ controller:
                 service:
                   name: jenkins
                   port:
-                    number: 8080  # A porta do serviço do Jenkins
+                    number: 8080  
   
   resources:
     requests:
@@ -49,6 +49,7 @@ controller:
     enabled: true
     size: 8Gi
     storageClass: default
+    #storageClass: jenkins-sc
 
 rbac:
   create: true

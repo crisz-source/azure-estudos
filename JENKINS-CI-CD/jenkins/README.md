@@ -258,119 +258,87 @@ volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: true
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#### Jenkins
-
-Para instalar o Jenkins, siga os passos abaixo:
-
-1. Adicione a chave do Jenkins ao seu sistema:
-
-    ```bash
-    sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
-      https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
-    ```
-
-2. Adicione o repositório do Jenkins à lista de fontes do apt:
-
-    ```bash
-    echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
-    ```
-
-3. Atualize a lista de pacotes e instale o Jenkins:
-
-    ```bash
-    sudo apt-get update && sudo apt-get install -y jenkins
-    ```
-
-#### Chave de Segurança
-
-Para obter a senha inicial de administrador do Jenkins, execute o comando:
+8.1 ( recomendado para produção) - Yaml definido para ambiente de produção, porém ainda não testado.
 
 ```bash
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+# =============== PRODUÇÃO ===============
+controller:
+  admin:
+    existingSecret: jenkins-admin-secret  # Secret criado fora do YAML
+
+  serviceType: ClusterIP
+
+  installPlugins:
+    - kubernetes
+    - workflow-aggregator
+    - git
+    - configuration-as-code
+    - credentials-binding
+    - blueocean
+    - azure-credentials
+    - azure-vm-agents
+    - azure-container-agents
+
+  ingress:
+    enabled: true
+    apiVersion: networking.k8s.io/v1
+    ingressClassName: nginx
+    hostName: jenkins.seudominio.com.br  # Substitua pelo seu domínio real
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+      # cert-manager.io/cluster-issuer: "letsencrypt-prod" <- REMOVIDO
+    tls:
+      - hosts:
+          - jenkins.seudominio.com.br
+        secretName: jenkins-tls  # <- Esse Secret deve ser criado manualmente
+    rules:
+      - host: jenkins.seudominio.com.br
+        http:
+          paths:
+            - path: /
+              pathType: Prefix
+              backend:
+                service:
+                  name: jenkins
+                  port:
+                    number: 8080
+
+  resources:
+    requests:
+      cpu: "2"
+      memory: "4Gi"
+    limits:
+      cpu: "4"
+      memory: "8Gi"
+
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClass: default  # Ou um storage com snapshot habilitado, se tiver
+
+rbac:
+  create: true
+
+#=============== PRODUÇÃO ===============
+```
+8.2 (Recomendado para Produção) - Criar uma senha para acessar o Jenkins
+
+```bash
+kubectl create secret generic jenkins-admin-secret \
+  --from-literal=jenkins-admin-user=[SEU-USUARIO] \
+  --from-literal=jenkins-admin-password=[SUA-SENHA] \
+  -n jenkins
 ```
 
-#### Docker
 
-Para instalar o Docker, siga os passos abaixo:
 
-1. Adicione a chave GPG oficial do Docker:
 
-    ```bash
-    sudo apt-get update
-    sudo apt-get install ca-certificates curl
-    sudo install -m 0755 -d /etc/apt/keyrings
-    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-    sudo chmod a+r /etc/apt/keyrings/docker.asc
-    ```
 
-2. Adicione o repositório Docker às fontes do apt:
 
-    ```bash
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt-get update
-    ```
 
-3. Instale o Docker e seus componentes:
 
-    ```bash
-    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
-    ```
 
-4. Adicione o usuário atual e o usuário Jenkins ao grupo docker:
 
-    ```bash
-    sudo usermod -aG docker $USER
-    sudo usermod -aG docker jenkins
-    ```
 
-5. Reinicie o Jenkins para aplicar as permissões no Docker:
-
-    ```bash
-    sudo systemctl restart jenkins
-    ```
-
-#### Kubectl
-
-Para instalar o kubectl, siga os passos abaixo:
-
-1. Adicione as chaves e repositórios necessários:
-
-    ```bash
-    sudo apt-get update
-    sudo apt-get install -y apt-transport-https ca-certificates curl gnupg
-
-    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-    sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-    ```
-
-2. Adicione o repositório do Kubernetes:
-
-    ```bash
-    echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-    sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
-    ```
-
-3. Atualize a lista de pacotes e instale o kubectl:
-
-    ```bash
-    sudo apt-get update
-    sudo apt-get install -y kubectl
     ```

@@ -1,0 +1,54 @@
+controller:
+  admin:
+    username: admin
+    password: admin123
+
+  serviceType: ClusterIP
+
+  installPlugins:
+    - kubernetes
+    - workflow-aggregator
+    - git
+    - configuration-as-code
+    - credentials-binding
+    - blueocean
+    - azure-credentials
+    - azure-vm-agents
+    - azure-container-agents
+
+  ingress:
+    enabled: true
+    apiVersion: networking.k8s.io/v1
+    #hostName: dominio.com.br  
+    hostName: jenkins.74.163.168.68.nip.io  
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    ingressClassName: nginx
+    rules:
+      #- host: dominio.com.br
+      - host: jenkins.74.163.168.68.nip.io  
+        http:
+          paths:
+            - path: /
+              pathType: Prefix
+              backend:
+                service:
+                  name: jenkins
+                  port:
+                    number: 8080  # A porta do serviço do Jenkins
+  
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "2Gi"
+
+  persistence:
+    enabled: true
+    size: 8Gi
+    storageClass: default
+
+rbac:
+  create: true

@@ -20,7 +20,7 @@ az aks get-credentials -g $rg -n $aks
 kubectl get nodes
 
 # Criar Namespace para os recursos do Ingress
-ns=ingress
+ns=ingress-nginx
 kubectl create namespace $ns
 
 # Adicionar repositorio oficial do ingress nginx
@@ -32,8 +32,8 @@ helm repo update
 kubectl get svc -A
 
 
-# Ip do LoadBalancer
-ip=74.163.192.223
+# Criar ip público do LoadBalancer e coloca-lo no mesmo grupo de recursos do AKS
+ip=74.163.168.68
 
 # Usar Helm para fazer deploy do  NGINX ingress controller
 helm install ingress-nginx ingress-nginx/ingress-nginx \

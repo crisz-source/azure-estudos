@@ -319,7 +319,6 @@ controller:
 rbac:
   create: true
 
-#=============== PRODUÇÃO ===============
 ```
 8.2 (Recomendado para Produção) - Criar uma senha para acessar o Jenkins
 
@@ -329,7 +328,10 @@ kubectl create secret generic jenkins-admin-secret \
   --from-literal=jenkins-admin-password=[SUA-SENHA] \
   -n jenkins
 ```
+#=============== PRODUÇÃO ===============
 
+9. Instalando Pluguins, vá em: Gerenciar Jenkins > Plugins > Extensões disponíveis
+- Em Extensões disponíveis, pesquise por: Docker, Docker pipeline, Kubernetes CLI; Esses plugins vai ser necessário para que o jenkins consiga executar comandos docker e Kubernetes 
 
 
 

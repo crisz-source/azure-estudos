@@ -1,14 +1,17 @@
+###### ESSA VERSÃO DO JENKINS EM UM AKS ESTÁ EM TESTES, NÃO ESTÁ FUNCIONANDO 100%, ESTOU RESOLVENDO AINDA POIS NA HORA DE EXECUTAR COMANDOS DOCKER NA PIPELINE, A PIPELINE QUEBRA, E É NECESSÁRIO HABILITAR UM AGENTE DO DOCKER QUE ESTOU ESTUDANDO AINDA
+
 ### Instalação do Jenkins via helm no AKS
 
 #### Jenkins
 
 ###### SEQUENCIA DE DEPLOY, ceritifique-se que esteja no diretório dos arquivos .yaml 
 ```bash 
-helm install jenkins jenkins/jenkins -n jenkins -f jenkins-rbac.yaml
+helm install jenkins jenkins/jenkins -n jenkins -f jenkins-values-ingress.yaml
 kubectl apply -f jenkins-rbac.yaml
+kubectl get svc -n jenkins
 ```
-
-
+### Build
+- É necessário realizar um build de uma imagem que tenha o docker instalado, para que o jenkins consiga executar comandos docker na pipeline, o arquivo dockerfile está no diretório JENKINS-CI-CD/jenkins/ci-cd/deploy-jenkins
 
 
 1. Adicionar o repositório Helm do Jenkins

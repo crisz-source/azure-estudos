@@ -1,0 +1,76 @@
+controller:
+  admin:
+    username: cristhian
+    password: admin123
+
+  serviceType: ClusterIP
+
+  installPlugins:
+    - kubernetes                  # Integração com Kubernetes (para agents e builds)
+    - git                         # Integração com repositórios Git
+    - docker-plugin               # Integração com Docker como cloud de agentes
+    - docker-workflow             # Usar Docker dentro de pipelines
+    - credentials-binding         # Para injetar credenciais em pipelines
+    - azure-credentials           # Permite usar credenciais do Azure
+    - azure-vm-agents             # (Opcional) Agentes Jenkins em VMs do Azure
+    - kubernetes-cli              # kubectl no pipeline
+    - azure-cli                   # az CLI em pipelines
+
+  ingress:
+    enabled: true
+    apiVersion: networking.k8s.io/v1
+    #hostName: jenkins.dominio.com.br  
+    hostName: jenkins.74.163.168.68.nip.io  
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    ingressClassName: nginx
+    rules:
+      #- host: jenkins.dominio.com.br
+      - host: jenkins.74.163.168.68.nip.io  
+        http:
+          paths:
+            - path: /
+              pathType: Prefix
+              backend:
+                service:
+                  name: jenkins
+                  port:
+                    number: 8080  
+  
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "2Gi"
+
+  persistence:
+    enabled: true
+    size: 8Gi
+    storageClass: default
+    #storageClass: jenkins-sc
+
+  JCasC:
+    enabled: true
+    configScripts:
+      docker-agent-config: |
+        jenkins:
+          clouds:
+            - kubernetes:
+                name: "kubernetes"
+                templates:
+                  - name: "docker-agent"
+                    label: "docker"
+                    containers:
+                      - name: "jnlp"
+                        image: "jenkinshub.azurecr.io/jenkins-agent-docker"
+                        imagePullPolicy: "IfNotPresent"
+                        ttyEnabled: true
+                        command: ""
+                    nodeUsageMode: NORMAL
+                    idleMinutes: 5
+                    instanceCap: 5
+
+rbac:
+  create: true

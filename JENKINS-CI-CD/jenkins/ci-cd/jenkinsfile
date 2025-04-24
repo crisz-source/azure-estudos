@@ -9,14 +9,26 @@ pipeline {
         stage('Build docker image') { 
             // os passos de execução, como se fossem os jobs do GitHub Actions
             steps {
-                sh 'echo "Executando o comando docker build"'
+                // esse script ta sendo criado pois já possuo o plugin instalado do docker, para que a pipeline use comandos docker
+                script{
+                    // variável que vai resultar a criação da imagem docker
+                    dockerapp = docker.build("jenkinshub.azurecr.io/conversao:${env.BUILD_ID}", '-f JENKINS-CI-CD/jenkins/src/Dockerfile JENKINS-CI-CD/jenkins/src ') // utilziando o build e usando a tag incrimental da build
+                }
             }
         }
 
         stage('Push docker image') { 
             // os passos de execução, como se fossem os jobs do GitHub Actions
             steps {
-                sh 'echo "Executando o comando docker push"'
+                
+                script{
+                    // configurando o acesso ao acr
+                     docker.withRegistry("https://jenkinshub.azurecr.io", "acr-admin-user")
+
+                        // subindo duas imagens, uma latest e uma versionada
+                        dockerapp.push('latest')
+                        dockerapp.push("${env.BUILD_ID}")
+                }
             }
         }
 

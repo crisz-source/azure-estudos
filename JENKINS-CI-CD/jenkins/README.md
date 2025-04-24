@@ -335,7 +335,7 @@ kubectl create secret generic jenkins-admin-secret \
 
 
 
-#================================= COMO USAR ===============================
+#================================= COMO USAR EM AMBIENTE DE TESTES - NÃO SEGURO ===============================
 
 1. Vá em: Painel de controle > Nova tarefa 
 - Selecione a Pipelie, adicione um nome, clique em "Tudo certo"
@@ -349,12 +349,89 @@ kubectl create secret generic jenkins-admin-secret \
 - Adicione o caminho do script "Jenkinsfile" no github, exemplo: azure-estudos/JENKINS-CI-CD/jenkins/ci-cd
 /jenkinsfile
 
+2. Logar no acr de forma -----INSEGURA------
 
+- Acesse o portal do Azure.
+- Vá até seu Container Registry (jenkinshub).
+- No menu lateral, vá em Access keys.
+-Ative a opção Admin user.
 
+- Você verá:
+Username
+Password e Password2
 
+3. Como usar no Jenkins:
+- No Jenkins, vá em Manage Jenkins > Credentials > Global > Add Credentials.
+- Tipo: Username with password
+- Username: o nome mostrado no Azure.
+- Password: a senha (Password ou Password2)
+- ID: por exemplo acr-admin-user
 
+Jenkinsfile com admin user:
 
+```bash
+docker.withRegistry("https://jenkinshub.azurecr.io", "acr-admin-user") {
+    dockerImage.push()
+}
+```
 
+#================================= COMO USAR EM AMBIENTE DE PRODUÇÃO - SEGURO ===============================
+1. Crie o SP com permissão para usar o ACR
+```bash
+# Descobre o ID do ACR
+ACR_ID=$(az acr show --name jenkinshub --query id --output tsv)
 
+# Cria o Service Principal com permissão para fazer push/pull
+az ad sp create-for-rbac \
+  --name jenkins-acr-sp \
+  --role acrpush \
+  --scopes $ACR_ID
+```
+- Esse comando retorna algo assim: (Guarde bem o appId e o password, vai usar eles no Jenkins.)
+```bash
+{
+  "appId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "displayName": "jenkins-acr-sp",
+  "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "tenant": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+}
+```
+2. Adicione no Jenkins
+- Vá em: Manage Jenkins > Credentials > Global > Add Credentials.
+- Tipo: Username with password
+- Username: o appId
+- Password: o password
+- ID: acr-serviceprincipal (ou qualquer nome que você quiser usar no pipelin
 
-    ```
+3. Jenkinsfile com docker push autenticado no ACR
+```bash
+pipeline {
+    agent any
+
+    environment {
+        ACR = 'jenkinshub.azurecr.io'
+        IMAGE_NAME = 'conversao'
+        TAG = "${env.BUILD_ID}"
+    }
+
+    stages {
+        stage('Build docker image') {
+            steps {
+                script {
+                    dockerImage = docker.build("${env.ACR}/${env.IMAGE_NAME}:${env.TAG}", "-f JENKINS-CI-CD/jenkins/src/Dockerfile .")
+                }
+            }
+        }
+
+        stage('Push docker image') {
+            steps {
+                script {
+                    docker.withRegistry("https://${env.ACR}", "acr-serviceprincipal") {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+    }
+}
+```

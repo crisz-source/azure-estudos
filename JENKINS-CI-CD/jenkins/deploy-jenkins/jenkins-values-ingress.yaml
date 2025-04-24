@@ -5,8 +5,24 @@ controller:
 
   serviceType: ClusterIP
 
+  # installPlugins:
+  #   - kubernetes
+  #   - workflow-aggregator
+  #   - git
+  #   - configuration-as-code
+  #   - credentials-binding
+  #   - blueocean
+  #   - azure-credentials
+  #   - azure-vm-agents
+  #   - azure-container-agents
+
   installPlugins:
     - kubernetes
+    - docker-plugin
+    - docker-workflow
+    - docker-commons
+    - cloudbees-docker-commons
+    - docker-build-step
     - workflow-aggregator
     - git
     - configuration-as-code
@@ -15,24 +31,8 @@ controller:
     - azure-credentials
     - azure-vm-agents
     - azure-container-agents
-
-    # installPlugins:
-    # - kubernetes
-    # - docker-plugin
-    # - docker-workflow
-    # - docker-commons
-    # - cloudbees-docker-commons
-    # - docker-build-step
-    # - workflow-aggregator
-    # - git
-    # - configuration-as-code
-    # - credentials-binding
-    # - blueocean
-    # - azure-credentials
-    # - azure-vm-agents
-    # - azure-container-agents
-    # - azure-cli
-    # - kubernetes-cli
+    - azure-cli
+    - kubernetes-cli
 
   ingress:
     enabled: true

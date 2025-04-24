@@ -2,6 +2,15 @@
 
 #### Jenkins
 
+###### SEQUENCIA DE DEPLOY, ceritifique-se que esteja no diretório dos arquivos .yaml 
+```bash 
+helm install jenkins jenkins/jenkins -n jenkins -f jenkins-rbac.yaml
+kubectl apply -f jenkins-rbac.yaml
+```
+
+
+
+
 1. Adicionar o repositório Helm do Jenkins
 
 ```bash
@@ -53,8 +62,30 @@ rbac:
   create: true
 ```
 
+3.1 - Jenkins com ingress, Instalando o ingress
+# Adicionar repositorio oficial do ingress nginx
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add stable https://charts.helm.sh/stable/
+helm repo update
 
-3.1 - Jenkins com ingress
+# Verificar o IP Do loadbalancer criado pelo helm: 
+kubectl get svc -A
+
+
+# Criar ip público do LoadBalancer e coloca-lo no mesmo grupo de recursos do AKS
+ip=74.163.168.68
+
+# Usar Helm para fazer deploy do  NGINX ingress controller
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+    --namespace $ns \
+    --set controller.replicaCount=1 \
+    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
+    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux \
+    --set controller.service.externalTrafficPolicy=Local \
+    --set controller.service.loadBalancerIP="$ip" 
+
+# Yaml do jenkins com ingress
+
 ```bash
 controller:
   admin:
@@ -202,7 +233,7 @@ rbac:
 4. Instalar o Jenkins com Helm
 
 ```bash
-helm install jenkins jenkins/jenkins -n jenkins -f jenkins-values.yaml
+helm install jenkins jenkins/jenkins -n jenkins -f jenkins-values-ingress.yaml
 ```
 
 5. Acessar o Jenkins
@@ -234,6 +265,12 @@ subjects:
   name: jenkins
   namespace: jenkins
 ```
+6.1 Aplicar o RBAC para o funcionamento do Jenkins com o AKS
+```bash
+kubectl apply -f jenkins-rbac.yaml 
+```
+
+
 
 7. Configurar o Kubernetes plugin dentro do Jenkins
 # Depois de acessar o painel do Jenkins:
@@ -434,4 +471,14 @@ pipeline {
         }
     }
 }
+
+```
+
+3. Desinstalando o Jenkins
+```bash
+helm list --namespace jenkins
+helm uninstall jenkins --namespace jenkins
+helm list --namespace jenkins
+kubectl delete namespace jenkins
+helm repo remove jenkins
 ```

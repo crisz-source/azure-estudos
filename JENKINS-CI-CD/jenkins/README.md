@@ -335,6 +335,21 @@ kubectl create secret generic jenkins-admin-secret \
 
 
 
+#================================= COMO USAR ===============================
+
+1. Vá em: Painel de controle > Nova tarefa 
+- Selecione a Pipelie, adicione um nome, clique em "Tudo certo"
+- Aguarde a criação do template
+- Modifique o template de acordo com a sua preferência, aqui eu deixei tudo padrão
+- Depois do template criado, em definição, selecione "Pipeline script from SCM" 
+- SCM, escolha "Git"
+- Coloque A URL do repositório
+- Credencial; .............................
+- Defina a Branch que vai ser utilizada
+- Adicione o caminho do script "Jenkinsfile" no github, exemplo: azure-estudos/JENKINS-CI-CD/jenkins/ci-cd
+/jenkinsfile
+
+
 
 
 

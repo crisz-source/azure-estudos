@@ -1,0 +1,35 @@
+//definindo a criação da pipeline
+pipeline{ 
+  
+  // Agente de execução, aonde vai ser executado essa pipeline, seja no linux, windows, mac etc.. aqui vou usar qualquer agent
+  agent any
+
+ // estagios de execução da pipeline
+  stages{
+    stage('Build docker image'){ 
+        //os passo a passo de executação, como se fosse os jobs do github actions
+        steps{
+            sh 'echo "Execuando o comando docker build"'
+        }
+    }
+
+
+  stages{
+    stage('Push docker image'){ 
+       
+        steps{
+            sh 'echo "Execuando o comando docker push"'
+        }
+    }
+
+  stages{
+    stage('Deploy no kubernetes'){ 
+        //os passo a passo de executação, como se fosse os jobs do github actions
+        steps{
+            sh 'echo "Execuando o comando kubectl apply"'
+        }
+    }
+
+  }
+
+}

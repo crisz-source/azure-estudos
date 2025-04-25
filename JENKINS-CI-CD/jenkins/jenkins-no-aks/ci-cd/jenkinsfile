@@ -12,7 +12,7 @@ pipeline {
                 // esse script ta sendo criado pois já possuo o plugin instalado do docker, para que a pipeline use comandos docker
                 script{
                     // variável que vai resultar a criação da imagem docker
-                    dockerapp = docker.build("jenkinshub.azurecr.io/conversao:${env.BUILD_ID}", '-f JENKINS-CI-CD/jenkins/src/Dockerfile JENKINS-CI-CD/jenkins/src ') // utilziando o build e usando a tag incrimental da build
+                    dockerapp = docker.build("jenkinshub.azurecr.io/conversao:${env.BUILD_ID}", '-f JENKINS-CI-CD/jenkins/jenkins-no-aks/deploy-jenkins/dockerfile JENKINS-CI-CD/jenkins/jenkins-no-aks/deploy-jenkins/ ') // utilziando o build e usando a tag incrimental da build
                 }
             }
         }

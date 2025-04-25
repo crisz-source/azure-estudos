@@ -51,26 +51,5 @@ controller:
     storageClass: default
     #storageClass: jenkins-sc
 
-  JCasC:
-    enabled: true
-    configScripts:
-      docker-agent-config: |
-        jenkins:
-          clouds:
-            - kubernetes:
-                name: "kubernetes"
-                templates:
-                  - name: "docker-agent"
-                    label: "docker"
-                    containers:
-                      - name: "jnlp"
-                        image: "jenkinshub.azurecr.io/jenkins-agent-docker"
-                        imagePullPolicy: "IfNotPresent"
-                        ttyEnabled: true
-                        command: ""
-                    nodeUsageMode: NORMAL
-                    idleMinutes: 5
-                    instanceCap: 5
-
 rbac:
   create: true

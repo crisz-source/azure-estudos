@@ -3,4 +3,4 @@
 "+ docker build -t jenkinshub.azurecr.io/conversao:4 -f JENKINS-CI-CD/jenkins/jenkins-no-aks/deploy-jenkins/dockerfile JENKINS-CI-CD/jenkins/jenkins-no-aks/deploy-jenkins/
 Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?"
 
-# Sendo assim, optei pelo 
+# Sendo assim, optei pelo DinD (Docker in Docker)
